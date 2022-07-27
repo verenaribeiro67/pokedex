@@ -5,39 +5,56 @@ import {
     StyleSheet,
     Image,
     ImageBackground,
-    TouchableHighlight,
-    Button,
-    TextInput,
-    TouchableOpacity
+    TouchableHighlight, TextInput,
 } from "react-native"
-import {createNativeStackNavigator } from "@react-navigation/native-stack";
-import treinadorPokemon from "../assets/treinador-de-pokemon.png";
-import { NavigationContainer} from "@react-navigation/native";
-import Home from "./Home";
+import Ash from "../assets/ash.png";
 import bgPokemon from "../assets/bgPokemon.jpg";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
-
 export default class Perfil extends Component{
 
+state = {
+    nomeTreinador: ''
+}
 
+
+
+salvarNomeTreinador = () => {
+    const { nomeTreinador } = this.state;
+    AsyncStorage.setItem('nomeTreinador',JSON.stringify(nomeTreinador));
+}
 
     render(){
+
+        const { nomeTreinador } = this.state;
 
         return (
 
             <View style={styles.container}>
                 <View style={styles.header}>
-                    <ImageBackground source={bgPokemon} resizeMode="cover" >
-                    <Image source={treinadorPokemon} style={{ width: 100, height: 100 }} />
-                    </ImageBackground>
+
+                    <Image source={Ash} style={{ width: 100, height: 150 }} />
+
+                    <Text style={{ color: '#fff',
+                                   fontSize: 20,
+                                   fontWeight: 'bold',
+                                   marginVertical: 10}
+                    }>
+                        {nomeTreinador}</Text>
+
                 </View>
 
                 <View style={styles.body}>
+
                     <Text style={styles.title}>Treinador(a) Pokémon</Text>
 
+                    <TextInput placeholder="Informe o nome do treinador"
+                               style={styles.input}
+                               onChangeText={novoTreinador => this.setState({nomeTreinador : novoTreinador})}
+                    />
 
-                    <TouchableHighlight style={styles.button} onPress={() => console.log(this.props.navigation.getParam)}>
+                    <TouchableHighlight style={styles.button}
+                                        onPress={() => this.salvarNomeTreinador()}>
                         <Text style={{ color: '#fff'}}>Salvar</Text>
                     </TouchableHighlight>
                 </View>
@@ -53,11 +70,13 @@ const styles = StyleSheet.create({
         backgroundColor: '#BE1D2D'
     },
     header: {
-        flex: 1,
+        flex: 2,
         justifyContent: 'center',
         alignItems: 'center',
         borderBottomStartRadius: 60,
-        borderBottomEndRadius: 60
+        borderBottomEndRadius: 60,
+        width: '100%',
+        height: '100%'
     },
     body: {
         flex: 3,
@@ -74,17 +93,21 @@ const styles = StyleSheet.create({
     },
     title: {
         fontSize: 18,
-        marginTop: 20,
+        marginTop: 40,
         color: '#000000'
     },
     button: {
-        backgroundColor: '#5aa2cc',
+        backgroundColor: '#171616',
         height: 40,
         width: '80%',
         padding: 10,
         borderRadius: 5,
         alignItems: 'center',
         justifyContent: 'center'
+    },
+    input: {
+        marginBottom: 40,
+        fontSize: 20
     },
     paragraph: {
         textAlign: 'justify',

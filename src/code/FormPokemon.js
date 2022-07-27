@@ -1,12 +1,8 @@
 import React, { Component } from "react";
-import {Text, View, StyleSheet, Image, ImageBackground, TouchableHighlight, Button, ScrollView} from "react-native"
-import {createNativeStackNavigator } from "@react-navigation/native-stack";
-import { NavigationContainer} from "@react-navigation/native";
-import Home from "./Home";
+import {Text, View, StyleSheet, ImageBackground, Button, ScrollView} from "react-native"
 import {Input} from "react-native-elements";
 import bgForm from "../assets/bgForm.jpg";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import bgPokemon from "../assets/bgPokemon.jpg";
 
 export default class FormPokemon extends Component{
 
@@ -16,37 +12,45 @@ export default class FormPokemon extends Component{
         altura: '',
         peso: '',
         tipo: '',
-        avatarUrl: '',
-        qtdPokemons: 0
+        avatarUrl: null,
+        qtdPokemons: null
 
     }
+
 
     componentDidMount() {
-        // this.setState(this.props.route.params.paramKey.pokemons);
-        this.verificaNumeroPokemons();
+        this.setState(this.props.route.params.pokemon);
+        this.onGoBack = this.listarTodosPokemons.bind(this);
     }
 
-    verificaNumeroPokemons = () => {
-        const { qtdPokemons } = this.state;
-        if(this.salvarPokemons){
-            this.setState.qtdPokemons++;
+    listarTodosPokemons = async () => {
+
+        try {
+            let pokemons = JSON.parse(await AsyncStorage.getItem("pokemons"));
+            pokemons = Array.isArray(pokemons) ? pokemons : [];
+            // pokemons.sort((a,b) => a.name.localeCompare(b.name)) //sort -> ordenação de nomes
+            // AsyncStorage.removeItem("pokemons");
+            //verificação de array se estiver okay seta a lista, se não seta vazio
+            this.setState({pokemons}); //seta o estado dos pokemons
+        }
+        catch (e) {
+            console.log(e);
+            return e; //retorna o erro
         }
     }
 
     validaDadosPokemons = async () => {
-
         const { id } = this.state;
-
         let pokemons = JSON.parse(await AsyncStorage.getItem("pokemons"));
         pokemons = Array.isArray(pokemons) ? pokemons : [];
         if(id){
+            this.listarTodosPokemons.bind(this);
             return this.atualizarPokemons(pokemons);
             //se existir id, atualize, se não,  adicione
         }
         pokemons.push({...this.state, id:
                 Math.floor(Math.random() * 10000) + 1});
-                return this.salvarPokemons(pokemons); //adiciona
-
+        return this.salvarPokemons(pokemons); //adiciona
     }
 
 
@@ -59,21 +63,25 @@ export default class FormPokemon extends Component{
     }
 
 
-    atualizarPokemons = ( pokemons) => {
+    atualizarPokemons = ( pokemons ) => {
         const { id } = this.state; //pegar o id do state
-        let novoPokemon = pokemons.map(editarPokemon => {
+        let novosPokemons = pokemons.map(
+            editarPokemon => {
             if(editarPokemon.id === id){
                 editarPokemon = this.state;
+
+                if(typeof this.props.route.params?.onGoBackCallback == 'function'){
+                    this.props.route.params.onGoBackCallback();
+                }
             }
             return editarPokemon;
         });
-        this.salvar(novoPokemon); //se não editar, salvar
+        this.salvarPokemons(novosPokemons); //se não editar, salvar
     }
 
 
     render(){
         const { nome, avatarUrl, peso, altura, tipo, id } = this.state;
-
         return (
 
             <ScrollView>

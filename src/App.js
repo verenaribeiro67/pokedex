@@ -128,7 +128,7 @@ export default class App extends Component{
                                          title: "Voltar",
                                          headerShown: true,
                                          headerStyle: {
-                                             backgroundColor: '#211d1f',
+                                             backgroundColor: '#BE1D2D',
                                              elevation: 0,
                                              shadowOpacity: 0,
                                              borderBottomWidth: 0,

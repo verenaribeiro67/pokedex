@@ -1,16 +1,13 @@
 import React, { Component } from "react";
 import {
     Text, View, StyleSheet, Image,
-    ImageBackground, TouchableOpacity, ScrollView, Button
+    ImageBackground,ScrollView, TouchableHighlight
 } from "react-native"
-import {createNativeStackNavigator } from "@react-navigation/native-stack";
-import { NavigationContainer} from "@react-navigation/native";
-import ListaPokemons from "./ListaPokemons";
-import Home from "./Home";
 import bgPokemon from "../assets/bgPokemon.jpg";
 import pokebola from "../assets/pokebola.png";
-import {Avatar, ListItem} from "react-native-elements";
 import Icon from "react-native-vector-icons/MaterialIcons";
+import FormPokemon from "./FormPokemon";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export default class Info extends Component{
 
@@ -21,24 +18,22 @@ export default class Info extends Component{
         altura: '',
         peso: '',
         tipo: '',
-        avatarUrl: '',
-        qtdPokemons: 0
+        avatarUrl: null,
+        qtdPokemons: ''
 
     }
 
     componentDidMount() {
-        // this.setState(this.props.route)
-        this.setState(this.props.route.params);
         this.onGoBack = this.listarTodosPokemons.bind(this);
+        this.setState(this.props.route.params.pokemon);
     }
 
 
     listarTodosPokemons = async () => {
-        const { id, nome, tipo, altura, peso, qtdPokemons } = this.state;
+        const { id } = this.state;
         try {
             let pokemons = JSON.parse(await AsyncStorage.getItem("pokemons"));
             let pokemon = pokemons.find(editarPokemon => editarPokemon.id === id);
-            console.log(qtdPokemons)
             if(this.props.route.params.onGoBackCallback.isFunction()){
                 this.props.route.params.onGoBackCallback();
             }
@@ -52,15 +47,26 @@ export default class Info extends Component{
 
 render(){
 
-    const { nome, id, tipo, peso, altura, avatarUrl, qtdPokemons } = this.state;
+    const { nome, id, tipo, peso, altura, avatarUrl } = this.state;
 
         return (
             <ScrollView>
                 <ImageBackground source={bgPokemon} resizeMode="cover" style={{ width: '100%'}}>
                 <View style={styles.container}>
                 <View style={styles.header}>
-                        <Image source={{ uri: this.props.route.params.avatarUrl.toString()}}
-                               style={{ width: 170, height: 170 }} />
+                        <Image source={{ uri: avatarUrl}}
+                               style={{ width: 170, height: 170, marginVertical: 25 }} />
+
+
+                    <TouchableHighlight style={styles.editButton} activeOpacity={0.7}>
+                        <Icon name="edit"
+                              size={25}
+                              color="black"
+                              onPress={() => this.props.navigation.navigate('FormPokemon',
+                                  {pokemon:this.state, onGoBackCallback: this.onGoBack})}
+                        />
+                    </TouchableHighlight>
+
                 </View>
 
 
@@ -71,12 +77,14 @@ render(){
                     </Text>
 
                     <Text style={styles.paragraph2}>
-                        {id}
+                        #{id}
                     </Text>
 
                     <View style={{ flexDirection: 'row', justifyContent: 'center'}}>
                         <Text style={styles.text2}>
                             {tipo}
+                            {/*{ tipo = "fogo" ? <Image source={require('../assets/fire.png')} style={styles.icon} /> :*/}
+                            {/*<Image source={require('../assets/water.png')}/>}*/}
                         </Text>
 
                         <View style={styles.verticleLine}></View>
@@ -93,8 +101,8 @@ render(){
 
                     </View>
 
-                    <Text style={{ textAlign: 'justify', marginHorizontal: 40, marginTop: 20, fontSize: 16, color: '#fff'}}>
-                        {nome} é um Pokémon do banco de dados do Pokédex, tipo {tipo},
+                    <Text style={{ textAlign: 'justify', marginHorizontal: 36, marginTop: 20, fontSize: 18, color: '#fff'}}>
+                        {nome} é um Pokémon do banco de dados do Pokédex, do tipo {tipo},
                         com altura de {altura} m e {peso} kg.
                     </Text>
 
@@ -103,7 +111,7 @@ render(){
                            style={{ width: 100, height: 100, textAlign: 'center', marginBottom: 120}} />
                     </View>
 
-                </View>
+                    </View>
             </View>
                 </ImageBackground>
     </ScrollView>
@@ -130,6 +138,10 @@ const styles = StyleSheet.create({
         marginLeft: 30,
         color: '#ffffff'
     },
+    icon: {
+        width: 20,
+        height: 20
+    },
     body: {
         flex: 1,
         backgroundColor: '#100f0e',
@@ -137,7 +149,7 @@ const styles = StyleSheet.create({
         borderTopEndRadius: 60
     },
     subTitle: {
-        fontSize: 18,
+        fontSize: 22,
         fontWeight: '600',
         marginTop: 10,
         marginLeft: 30,
@@ -147,14 +159,25 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         marginTop: 20,
-        marginBottom: 40
+        marginBottom: 0
+    },
+    editButton: {
+        position: 'absolute',
+        right: 20,
+        bottom: 150,
+        width: 30,
+        height: 30,
+        borderRadius: 30,
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: "rgba(208,204,204,0.32)"
     },
     paragraph: {
         textAlign: 'center',
         marginTop: 20,
         fontWeight: 'bold',
         marginHorizontal: 30,
-        fontSize: 30,
+        fontSize: 26,
         color: '#fff'
     },
     paragraph2: {
@@ -174,7 +197,7 @@ const styles = StyleSheet.create({
         marginTop: 20,
         marginLeft: 'auto',
         marginRight: 'auto',
-        fontSize: 20,
+        fontSize: 18,
         color: '#fff'
     },
     verticleLine:{

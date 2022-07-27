@@ -1,5 +1,5 @@
-import React, { Component } from "react";
-import {Text, View, StyleSheet, ImageBackground, Button} from "react-native"
+import React, {Component} from "react";
+import {Button, ImageBackground, StyleSheet, Text, View} from "react-native"
 import {Input} from "react-native-elements";
 import bgForm from "../assets/bgForm.jpg";
 import AsyncStorage from "@react-native-async-storage/async-storage";

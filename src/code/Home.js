@@ -1,13 +1,13 @@
 import React, { Component } from "react";
 import {Text, View, StyleSheet, Image, ImageBackground, TouchableHighlight, Button} from "react-native";
 import bgHome from "../assets/bgHome.png";
-import {createNativeStackNavigator } from "@react-navigation/native-stack";
-import { NavigationContainer} from "@react-navigation/native";
 import ListaPokemons from "./ListaPokemons";
 import Info from "./Info";
 import Perfil from "./Perfil";
 
 export default class Home extends Component{
+
+
     render(){
     return (
         <View style={styles.container}>
@@ -18,6 +18,7 @@ export default class Home extends Component{
                 <View style={styles.header}>
                     <Image source={require('../assets/logo.png')}
                            style={{ width: '60%', height: '60%', resizeMode: 'contain' }} />
+
                 </View>
 
                 <View style={styles.body}>
@@ -27,15 +28,21 @@ export default class Home extends Component{
                         <Text style={styles.text}>Entrar</Text>
                     </TouchableHighlight>
 
-                    <TouchableHighlight style={styles.button}
-                                        onPress={() => this.props.navigation.navigate("Info")}>
-                        <Text style={styles.text}>Informações</Text>
-                    </TouchableHighlight>
 
                     <TouchableHighlight style={styles.button}
                                         onPress={() => this.props.navigation.navigate("Perfil")}>
                         <Text style={styles.text}>Perfil</Text>
                     </TouchableHighlight>
+
+                    <TouchableHighlight style={styles.button}
+                                        onPress={() => this.props.navigation.navigate("Info")}>
+                        <Text style={styles.text}>Informações</Text>
+                    </TouchableHighlight>
+
+                    {/*<TouchableHighlight style={styles.button}*/}
+                    {/*                    onPress={() => console.log(this.props.route)}>*/}
+                    {/*    <Text style={styles.text}>Teste</Text>*/}
+                    {/*</TouchableHighlight>*/}
 
                 </View>
 

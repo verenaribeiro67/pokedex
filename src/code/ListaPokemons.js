@@ -23,9 +23,8 @@ export default class ListaPokemons extends Component{
     }
 
 
-
-    salvar = ( pokemons ) => {
-        AsyncStorage.setItem('users',JSON.stringify(pokemons));
+    salvarPokemons = ( pokemons ) => {
+        AsyncStorage.setItem('pokemons',JSON.stringify(pokemons));
         this.listarTodosPokemons();
     }
 
@@ -34,9 +33,9 @@ export default class ListaPokemons extends Component{
 
         try {
             let pokemons = JSON.parse(await AsyncStorage.getItem("pokemons"));
-            let verifica = Array.isArray(pokemons) ? pokemons : [];
+            pokemons = Array.isArray(pokemons) ? pokemons : [];
+            // pokemons.sort((a,b) => a.name.localeCompare(b.name)) //sort -> ordenação de nomes
              // AsyncStorage.removeItem("pokemons");
-            pokemons = verifica;
                 //verificação de array se estiver okay seta a lista, se não seta vazio
             this.setState({pokemons}); //seta o estado dos pokemons
         }
@@ -60,11 +59,11 @@ export default class ListaPokemons extends Component{
     }
 
 
-    acoesSwipeDireita = () => {
+    acoesSwipeDireita = (pokemon) => {
         return (
             <>
                 <Button
-                    onPress={() => this.deletar()}
+                    onPress={() => this.deletar(pokemon)}
                     type="clear"
                     icon={<Icon name="delete" size={25} color="white"/>}
                     buttonStyle={{ minHeight: '100%', backgroundColor: 'red' }}
@@ -74,41 +73,26 @@ export default class ListaPokemons extends Component{
         )
     }
 
-    deletar = async (pokemon) => {
+    deletar = (pokemon) => {
 
-        const {pokemons} = this.state;
 
         Alert.alert('Excluir Pokémon',
-                    'Tem certeza que deseja excluir?', [
-            {
+                    'Tem certeza que deseja excluir?',
+            [{
                 text: 'Sim',
                 onPress:() => {
-
-                        let novoPokemon = pokemons.filter(selectPokemon => selectPokemon.id != pokemon.id);
-                        this.salvar(novoPokemon);
-                },
+                    console.log(pokemon.id)
+                    const {pokemons} = this.state;
+                    let novosPokemons = pokemons.filter(selectPokemon => selectPokemon.id != pokemon.id);
+                    // console.log(novosPokemons)
+                    novosPokemons.forEach(p => console.log(p.id));
+                    this.salvarPokemons(novosPokemons);
+                }
             },
             {
                 text: 'Não'
             }
         ])
-    }
-
-    acoesSwipeEsquerda = pokemon => {
-        return (
-            <>
-                <Button
-                    onPress={() => this.props.navigation.navigate('FormPokemon', {pokemon:this.state, onGoBackCallback: this.onGoBack})}
-                    type="clear"
-                    icon={<Icon name="edit" size={25} color="white"/>}
-                    buttonStyle={{ minHeight: '100%', backgroundColor: '#100f0e' }}
-                />
-
-            </>
-
-
-        )
-
     }
 
     // pesquisa = ({ item: pokemon }) => {
@@ -117,19 +101,21 @@ export default class ListaPokemons extends Component{
     //     return poke;
     // }
 
-    exibir = ({item: pokemon}) => {
+    exibir = ({ item: pokemon }) => {
+        // console.log('Pokemon: '+pokemon.id)
        return(
            <>
                <ListItem.Swipeable
                key={pokemon.id.toString()}
                bottomDivider
-               rightContent={this.acoesSwipeDireita()}
-               leftContent={this.acoesSwipeEsquerda()}
-               onPress={() => this.props.navigation.navigate("ViewPokemon", pokemon)}>
+               chevron={{ color: 'black' }}
+               rightContent={this.acoesSwipeDireita(pokemon)}
+               onPress={() => this.props.navigation.navigate("ViewPokemon",
+                   {pokemon, onGoBackCallback:this.onGoBack})}>
                    <Avatar source={{ uri: pokemon.avatarUrl }} size={60} />
                    <ListItem.Content>
                        <ListItem.Title>
-                           <Text>{pokemon.nome}</Text>
+                           <Text style={{ fontSize: 20}}>{pokemon.nome}</Text>
                        </ListItem.Title>
                    </ListItem.Content>
                    <Icon
@@ -138,7 +124,7 @@ export default class ListaPokemons extends Component{
                        color='red'
                        size={25}
                        onPress={() => this.props.navigation.navigate("ViewPokemon",
-                                    { pokemon, onGoBackCallback:this.onGoBack })}/>
+                                    { pokemon, onGoBackCallback:this.onGoBack.listarTodosPokemons() })}/>
 
                    <ListItem.Chevron color="white" />
                </ListItem.Swipeable>
@@ -149,7 +135,6 @@ export default class ListaPokemons extends Component{
     render(){
 
         return (
-            <ScrollView>
             <View style={styles.container}>
                 <View style={styles.header}>
                     <View style={{ flexDirection: 'row', justifyContent: 'flex-end', marginRight: 20, marginBottom: -20}}>
@@ -178,7 +163,7 @@ export default class ListaPokemons extends Component{
                     <Icon name="add"
                           size={30}
                           color="white"
-                          onPress={() => this.props.navigation.navigate("FormPokemon", { paramKey: this.state.pokemons})}
+                          onPress={() => this.props.navigation.navigate("FormPokemon", {onGoBackCallback:this.onGoBack})}
                     />
                 </TouchableHighlight>
 
@@ -194,7 +179,6 @@ export default class ListaPokemons extends Component{
 
             </View>
 
-            </ScrollView>
         );
     }
 }
